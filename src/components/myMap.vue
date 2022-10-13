@@ -1,6 +1,6 @@
 <template>
    <div class="com-container" @dblclick="reverMap">
-    <div class="con-chart" ref="map_ref"></div>
+    <div class="com-chart" ref="map_ref"></div>
    </div>
 </template>
 <script>
@@ -141,9 +141,4 @@ export default {
 }
 </script>
 <style lang='less' scoped>
-.con-chart{
-    width: 100%;
-    height: 100%;
-    margin: 0 auto;
-}
 </style>

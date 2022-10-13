@@ -1,5 +1,7 @@
 <template>
+  <div class="com-page">
      <single-map/>
+  </div>
 </template>
 <script>
 import myMap from '@/components/myMap.vue'
