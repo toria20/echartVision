@@ -1,16 +1,16 @@
 <template>
-    <div class="screen-container">
+    <div class="screen-container" :style="containerStyle">
     <header class="screen-header">
       <div>
-        <img  alt="">
+        <img :src=headerSrc alt="">
       </div>
       <span class="logo">
         <span>xiaoxionglalalala</span>
       </span>
       <span class="title">电商平台实时监控系统</span>
       <div class="title-right">
-        <img src="/static/img/qiehuan_dark.png" class="qiehuan" @click="handleChangeTheme">
-        <span class="datetime">2049-01-01 00:00:00</span>
+        <img :src=themeSrc class="qiehuan" @click="handleChangeTheme">
+        <span class="datetime">2055-03-02 00:00:00</span>
       </div>
     </header>
     <div class="screen-body">
@@ -74,6 +74,8 @@ import Rank from '@/components/myRank.vue'
 import Seller from '@/components/mySeller.vue'
 import Stock from '@/components/myStock.vue'
 import Trend from '@/components/myTrend.vue'
+import { mapState } from 'vuex'
+import { getThemeValue } from '@/utils/theme_utils'
 export default {
   created () {
   // 注册接收到数据的回调函数
@@ -142,6 +144,21 @@ export default {
     Seller,
     Stock,
     Trend
+  },
+  computed: {
+    headerSrc () {
+      return '/static/img/' + getThemeValue(this.theme).headerBorderSrc
+    },
+    themeSrc () {
+      return '/static/img/' + getThemeValue(this.theme).themeSrc
+    },
+    containerStyle () {
+      return {
+        backgroundColor: getThemeValue(this.theme).backgroundColor,
+        color: getThemeValue(this.theme).titleColor
+      }
+    },
+    ...mapState(['theme'])
   }
 }
 </script>

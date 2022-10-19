@@ -8,6 +8,7 @@
 </template>
 <script>
 import { mapState } from 'vuex'
+import { getThemeValue } from '@/utils/theme_utils'
 export default {
   data () {
     return {
@@ -31,13 +32,14 @@ export default {
     },
     comStyle () {
       return {
-        fontSize: this.titleFontSize + 'px'
+        fontSize: this.titleFontSize + 'px',
+        color: getThemeValue(this.theme).titleColor
       }
     },
     ...mapState(['theme'])
   },
   mounted () {
-    this.initchart()
+    this.initChart()
     // this.getData()
     this.$socket.send({
       action: 'getData',
@@ -53,7 +55,7 @@ export default {
     this.$socket.unRegisterCallBack('hotData')
   },
   methods: {
-    initchart () {
+    initChart () {
       this.chartInstance = this.$echarts.init(this.$refs.hot_ref, this.theme)
       const initOption = {
         title: {
@@ -172,7 +174,7 @@ export default {
   },
   watch: {
     theme () {
-      console.log('主题切换了')
+      console.log('主题切换了hot')
       this.chartInstance.dispose() // 销毁当前的图表
       this.initChart() // 重新以最新的主题名称初始化图表对象
       this.screenAdapter() // 完成屏幕的适配

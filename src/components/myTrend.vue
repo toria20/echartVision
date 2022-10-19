@@ -14,6 +14,7 @@
 </template>
 <script>
 import { mapState } from 'vuex'
+import { getThemeValue } from '@/utils/theme_utils'
 export default {
   data () {
     return {
@@ -66,7 +67,8 @@ export default {
     // 这是给标题的样式
     comStyle () {
       return {
-        fontSize: this.titleFontSize + 'px'
+        fontSize: this.titleFontSize + 'px',
+        color: getThemeValue(this.theme).titleColor
       }
     },
     marginStyle () {
@@ -178,16 +180,16 @@ export default {
       this.updateChart()
       this.showChoice = false
     }
+  },
+  watch: {
+    theme () {
+      console.log('主题切换了w')
+      this.chartInstance.dispose() // 销毁当前的图表
+      this.initChart() // 重新以最新的主题名称初始化图表对象
+      this.screenAdapter() // 完成屏幕的适配
+      this.updateChart() // 更新图表的展示
+    }
   }
-  // watch: {
-  //   theme () {
-  //     console.log('主题切换了')
-  //     this.chartInstane.dispose() // 销毁当前的图表
-  //     this.initChart() // 重新以最新的主题名称初始化图表对象
-  //     this.screenAdapter() // 完成屏幕的适配
-  //     this.updateChart() // 更新图表的展示
-  //   }
-  // }
 }
 </script>
 <style lang='less' scoped>

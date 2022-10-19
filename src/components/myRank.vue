@@ -20,7 +20,7 @@ export default {
     this.$socket.registerCallBack('rankData', this.getData)
   },
   mounted () {
-    this.initchart()
+    this.initChart()
     // this.getData()
     this.$socket.send({
       action: 'getData',
@@ -38,7 +38,7 @@ export default {
   },
   methods: {
     // 初始化数据
-    initchart () {
+    initChart () {
       this.chartInstance = this.$echarts.init(this.$refs.rank_ref, this.theme)
       const initOption = {
         title: {
@@ -182,7 +182,7 @@ export default {
   },
   watch: {
     theme () {
-      console.log('主题切换了')
+      console.log('主题切换了r')
       this.chartInstance.dispose() // 销毁当前的图表
       this.initChart() // 重新以最新的主题名称初始化图表对象
       this.screenAdapter() // 完成屏幕的适配

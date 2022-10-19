@@ -13,7 +13,7 @@ export default {
   data () {
     return {
       chartInstance: null,
-      allDate: null,
+      allData: null,
       mapData: {} // 所获取的矢量数据
     }
   },
@@ -88,17 +88,17 @@ export default {
     getData (ret) {
       // 获取服务器数据
       // const { data: ret } = await this.$http.get('map')
-      this.allDate = ret
-      // console.log(this.allDate)
+      this.allData = ret
+      // console.log(this.allData)
       this.updateChart()
     },
     updateChart () {
       // 处理图表所需的数据
       // 图例数据
-      const lengendArr = this.allDate.map(item => {
+      const lengendArr = this.allData.map(item => {
         return item.name
       })
-      const seriesArr = this.allDate.map(item => {
+      const seriesArr = this.allData.map(item => {
         // return这个对象就代表的是一个类别下的所有散点数据
         // 如果想在地图中显示散点的数据，需要给图表添加一个数据 coordinateSytem:geo
         return {
@@ -155,7 +155,7 @@ export default {
   },
   watch: {
     theme () {
-      console.log('主题切换了')
+      console.log('主题切换了m')
       this.chartInstance.dispose() // 销毁当前的图表
       this.initChart() // 重新以最新的主题名称初始化图表对象
       this.screenAdapter() // 完成屏幕的适配
