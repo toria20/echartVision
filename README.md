@@ -1,6 +1,6 @@
 电商平台实时监控系统
 
- 后台地址：
+ 后台地址：https://github.com/toria20/echartsVision-koa2.git
  
  一、技术栈
 该项目主要使用 Vue搭配Echarts采用组件化的方式开发完成,此外项目中陆续使用
