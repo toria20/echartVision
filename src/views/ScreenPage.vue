@@ -80,9 +80,11 @@ export default {
   created () {
   // 注册接收到数据的回调函数
     this.$socket.registerCallBack('fullScreen', this.recvData)
+    this.$socket.registerCallBack('themeChange', this.recvThemeChange)
   },
   destroyed () {
     this.$socket.unRegisterCallBack('fullScreen')
+    this.$socket.unRegisterCallBack('themeChange')
   },
   data () {
     return {
@@ -128,13 +130,16 @@ export default {
     },
     handleChangeTheme () {
       // 修改VueX中数据
+      // this.$store.commit('changeTheme')
+      this.$socket.send({
+        action: 'themeChange',
+        socketType: 'themeChange',
+        chartName: '',
+        value: ''
+      })
+    },
+    recvThemeChange () {
       this.$store.commit('changeTheme')
-      // this.$socket.send({
-      //   action: 'themeChange',
-      //   socketType: 'themeChange',
-      //   chartName: '',
-      //   value: ''
-      // })
     }
   },
   components: {
