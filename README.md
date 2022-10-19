@@ -27,6 +27,6 @@ cnpm install
 npm run serve
 
 三、运行效果截图
- 1.黑色主题
+ 1.黑色主题 ![Image text](https://raw.githubusercontent.com/toria20/im-storage/main/vision/success.png)
  2.白色主题
  3.部分截图
