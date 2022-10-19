@@ -3,10 +3,11 @@
     <div class="com-chart" ref="hot_ref"></div>
     <span class="iconfont arr-left" @click="toLeft" :style="comStyle">&#xe6ef;</span>
     <span class="iconfont arr-right" @click="toRight" :style="comStyle">&#xe6ed;</span>
-    <span class="cat-name" :style="comStyle">{{catname}}</span>
+    <span class="cat-name" :style="comStyle">{{catName}}</span>
    </div>
 </template>
 <script>
+import { mapState } from 'vuex'
 export default {
   data () {
     return {
@@ -16,8 +17,12 @@ export default {
       titleFontSize: 0
     }
   },
+  created () {
+  // 在组件创建完成之后 进行回调函数的注册
+    this.$socket.registerCallBack('hotData', this.getData)
+  },
   computed: {
-    catname () {
+    catName () {
       if (!this.alldata) {
         return ''
       } else {
@@ -28,20 +33,28 @@ export default {
       return {
         fontSize: this.titleFontSize + 'px'
       }
-    }
+    },
+    ...mapState(['theme'])
   },
   mounted () {
     this.initchart()
-    this.getData()
+    // this.getData()
+    this.$socket.send({
+      action: 'getData',
+      socketType: 'hotData',
+      chartName: 'hot',
+      value: ''
+    })
     window.addEventListener('resize', this.screenAdapter)
     this.screenAdapter()
   },
   destroyed () {
     window.removeEventListener('resize', this.screenAdapter)
+    this.$socket.unRegisterCallBack('hotData')
   },
   methods: {
     initchart () {
-      this.chartInstance = this.$echarts.init(this.$refs.hot_ref, 'chalk')
+      this.chartInstance = this.$echarts.init(this.$refs.hot_ref, this.theme)
       const initOption = {
         title: {
           text: '‖ 热销商品的占比',
@@ -54,7 +67,7 @@ export default {
         },
         tooltip: {
           show: true,
-          formatter: (arg) => {
+          formatter: arg => {
             const thirdCategory = arg.data.children
             let total = 0
             thirdCategory.forEach(item => {
@@ -85,11 +98,11 @@ export default {
       }
       this.chartInstance.setOption(initOption)
     },
-    async getData () {
+    getData (ret) {
       // 获取服务器的数据，对this.allData进行赋值以后，调用update方法更新图表
-      const { data: ret } = await this.$http.get('hotproduct')
+      // const { data: ret } = await this.$http.get('hotproduct')
       this.alldata = ret
-      // console.log(this.alldata)
+      console.log(this.alldata)
       this.updateChart()
     },
     updateChart () {
@@ -125,21 +138,22 @@ export default {
           }
         },
         legend: {
-          itemWidth: this.titleFontSize / 2,
-          itemHeight: this.titleFontSize / 2,
+          itemWidth: this.titleFontSize,
+          itemHeight: this.titleFontSize,
           itemGap: this.titleFontSize / 2,
           textStyle: {
-            FontSize: this.titleFontSize / 2
+            fontSize: this.titleFontSize / 2
           }
         },
         series: [
           {
             radius: this.titleFontSize * 4.5,
-            center: ['50%', '50%']
+            center: ['50%', '60%']
           }
         ]
       }
       this.chartInstance.setOption(adapterOption)
+      this.chartInstance.resize()
     },
     toLeft () {
       this.currentIndex--
@@ -154,6 +168,15 @@ export default {
         this.currentIndex = 0
       }
       this.updateChart()
+    }
+  },
+  watch: {
+    theme () {
+      console.log('主题切换了')
+      this.chartInstance.dispose() // 销毁当前的图表
+      this.initChart() // 重新以最新的主题名称初始化图表对象
+      this.screenAdapter() // 完成屏幕的适配
+      this.updateChart() // 更新图表的展示
     }
   }
 }

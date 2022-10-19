@@ -4,7 +4,7 @@
       <span>{{'▎ '+  showTitle}}</span>
       <span class="iconfont title-icon" :style="comStyle" @click="showChoice = !showChoice">&#xe6eb;</span>
       <div class="select-con" v-show="showChoice" :style="marginStyle">
-        <div class="select-item" v-for="item in selectType" :key="item.key" @click="handleSelect(item.key)">
+        <div class="select-item" v-for="item in selectTypes" :key="item.key" @click="handleSelect(item.key)">
           {{item.text}}
         </div>
       </div>
@@ -13,6 +13,7 @@
    </div>
 </template>
 <script>
+import { mapState } from 'vuex'
 export default {
   data () {
     return {
@@ -23,17 +24,30 @@ export default {
       titleFontSize: 0 // 标题的字体大小
     }
   },
+  created () {
+    // 在组建创建完成之后进行回调函数的注册
+    this.$socket.registerCallBack('trendData', this.getData)
+  },
   mounted () {
     this.initChart()
-    this.getData()
+    // this.getData()
+    // 发送数据给服务器
+    this.$socket.send({
+      action: 'getData',
+      socketType: 'trendData',
+      chartName: 'trend',
+      value: ''
+    })
     window.addEventListener('resize', this.screenAdapter)
     this.screenAdapter()
   },
   destroyed () {
+    // 进行回调函数的取消
     window.removeEventListener('resize', this.screenAdapter)
+    this.$socket.unRegisterCallBack('trendData')
   },
   computed: {
-    selectType () {
+    selectTypes () {
       if (!this.allData) {
         return []
       } else {
@@ -59,11 +73,12 @@ export default {
       return {
         marginLeft: this.titleFontSize + 'px'
       }
-    }
+    },
+    ...mapState(['theme'])
   },
   methods: {
     initChart () {
-      this.chartInstance = this.$echarts.init(this.$refs.trend_ref, 'chalk')
+      this.chartInstance = this.$echarts.init(this.$refs.trend_ref, this.theme)
       const initOption = {
         grid: {
           left: '3%',
@@ -90,10 +105,11 @@ export default {
       }
       this.chartInstance.setOption(initOption)
     },
-    async getData () {
+    // ret 服务端发送给客户端的数据
+    getData (ret) {
       // awair this.$http.get()
       // 对allData进行赋值
-      const { data: ret } = await this.$http.get('trend')
+      // const { data: ret } = await this.$http.get('trend')
       this.allData = ret
       this.updateChart()
     },
@@ -163,6 +179,15 @@ export default {
       this.showChoice = false
     }
   }
+  // watch: {
+  //   theme () {
+  //     console.log('主题切换了')
+  //     this.chartInstane.dispose() // 销毁当前的图表
+  //     this.initChart() // 重新以最新的主题名称初始化图表对象
+  //     this.screenAdapter() // 完成屏幕的适配
+  //     this.updateChart() // 更新图表的展示
+  //   }
+  // }
 }
 </script>
 <style lang='less' scoped>

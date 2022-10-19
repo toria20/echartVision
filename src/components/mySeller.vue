@@ -5,6 +5,7 @@
    </div>
 </template>
 <script>
+import { mapState } from 'vuex'
 export default {
   data () {
     return {
@@ -15,9 +16,19 @@ export default {
       timer: null // 定时器
     }
   },
+  created () {
+    // 在组件创建完成之后 进行回调函数的注册
+    this.$socket.registerCallBack('sellerData', this.getData)
+  },
   mounted () {
     this.initChart()
-    this.getData()
+    // this.getData()
+    this.$socket.send({
+      action: 'getData',
+      socketType: 'sellerData',
+      chartName: 'seller',
+      value: ''
+    })
     window.addEventListener('resize', this.screenAdapter)
     // 主动进行适配
     this.screenAdapter()
@@ -27,11 +38,12 @@ export default {
     clearInterval(this.timer)
     // 销毁监听器
     window.removeEventListener('resize', this.screenAdapter)
+    this.$socket.unRegisterCallBack('sellerData')
   },
   methods: {
     // 初始化echart实例对象
     initChart () {
-      this.chartInstance = this.$echarts.init(this.$refs.seller_ref, 'chalk')
+      this.chartInstance = this.$echarts.init(this.$refs.seller_ref, this.theme)
       // 对图标初始化的控制
       const initOption = {
         title: {
@@ -93,9 +105,9 @@ export default {
       this.chartInstance.setOption(initOption)
     },
     // 获取服务器数据
-    async getData () {
+    getData (ret) {
       // http:127.0.0.1:8888/api/seller
-      const { data: ret } = await this.$http.get('seller')
+      // const { data: ret } = await this.$http.get('seller')
       this.allDate = ret
       // 对数据进行排序
       this.allDate.sort((a, b) => {
@@ -173,6 +185,18 @@ export default {
       this.chartInstance.setOption(adapterOption)
       // 手动调用图标的resize方法才能有效果
       this.chartInstance.resize()
+    }
+  },
+  computed: {
+    ...mapState(['theme'])
+  },
+  watch: {
+    theme () {
+      console.log('主题切换了')
+      this.chartInstance.dispose() // 销毁当前的图表
+      this.initChart() // 重新以最新的主题名称初始化图表对象
+      this.screenAdapter() // 完成屏幕的适配
+      this.updateChart() // 更新图表的展示
     }
   }
 }

@@ -8,26 +8,25 @@ const theme = {
     themeSrc: 'qiehuan_dark.png',
     // 头部的线条
     headerBorderSrc: 'header_border_dark.png',
-    sellerAxisPointerColor: '#2D3443',
+    sellerAxisPointerColor: '#2D3443'
   },
   // 该主题未启用
   vintage: {
     backgroundColor: '#dddddd',
-    titleColor: "#000000",
+    titleColor: '#000000',
     themeSrc: 'qiehuan_light.png',
     headerBorderSrc: 'header_border_light.png',
-    sellerAxisPointerColor: '#f1f2f6',
+    sellerAxisPointerColor: '#f1f2f6'
   },
   westeros: {
     backgroundColor: '#dddddd',
-    titleColor: "#000000",
+    titleColor: '#000000',
     themeSrc: 'qiehuan_light.png',
     headerBorderSrc: 'header_border_light.png',
-    sellerAxisPointerColor: '#f1f2f6',
-  },
+    sellerAxisPointerColor: '#f1f2f6'
+  }
 }
 
-
-export function getThemeValue(themeName) {
+export function getThemeValue (themeName) {
   return theme[themeName]
 }

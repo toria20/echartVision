@@ -4,6 +4,7 @@
    </div>
 </template>
 <script>
+import { mapState } from 'vuex'
 export default {
   data () {
     return {
@@ -14,20 +15,31 @@ export default {
       timerId: null // 定时器的标识
     }
   },
+  created () {
+    // 在组件创建完成之后 进行回调函数的注册
+    this.$socket.registerCallBack('rankData', this.getData)
+  },
   mounted () {
     this.initchart()
-    this.getData()
+    // this.getData()
+    this.$socket.send({
+      action: 'getData',
+      socketType: 'rankData',
+      chartName: 'rank',
+      value: ''
+    })
     window.addEventListener('resize', this.screenAdapter)
     this.screenAdapter()
   },
   destroyed () {
     window.removeEventListener('resize', this.screenAdapter)
     clearInterval(this.timerId)
+    this.$socket.unRegisterCallBack('rankData')
   },
   methods: {
     // 初始化数据
     initchart () {
-      this.chartInstance = this.$echarts.init(this.$refs.rank_ref, 'chalk')
+      this.chartInstance = this.$echarts.init(this.$refs.rank_ref, this.theme)
       const initOption = {
         title: {
           text: '‖ 地区销售排行',
@@ -65,8 +77,8 @@ export default {
       })
     },
     // 获取数据
-    async getData () {
-      const { data: ret } = await this.$http.get('rank')
+    getData (ret) {
+      // const { data: ret } = await this.$http.get('rank')
       this.allData = ret
       // 对数据从大到小开始排序
       this.allData.sort((a, b) => {
@@ -151,10 +163,10 @@ export default {
       this.chartInstance.resize()
     },
     startInterval () {
+      if (this.timerId) {
+        clearInterval(this.timerId)
+      }
       this.timerId = setInterval(() => {
-        if (this.timerId) {
-          clearInterval(this.timerId)
-        }
         this.startValue++
         this.endValue++
         if (this.endValue > this.allData.length - 1) {
@@ -163,6 +175,18 @@ export default {
         }
         this.updateChart()
       }, 2000)
+    }
+  },
+  computed: {
+    ...mapState(['theme'])
+  },
+  watch: {
+    theme () {
+      console.log('主题切换了')
+      this.chartInstance.dispose() // 销毁当前的图表
+      this.initChart() // 重新以最新的主题名称初始化图表对象
+      this.screenAdapter() // 完成屏幕的适配
+      this.updateChart() // 更新图表的展示
     }
   }
 }

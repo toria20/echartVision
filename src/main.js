@@ -7,6 +7,11 @@ import './assets/font/iconfont.css'
 // 引入全局样式文件
 import './assets/css/global.less'
 import axios from 'axios'
+import SocketSerivce from '@/utils/socket_service'
+// 对服务端进行链接
+SocketSerivce.Instance.connect()
+// 其他的组件 this.$socket
+Vue.prototype.$socket = SocketSerivce.Instance
 // 请求基准路径的配置
 axios.defaults.baseURL = 'http://127.0.0.1:8888/api/'
 // 将axios挂载到原型对象上

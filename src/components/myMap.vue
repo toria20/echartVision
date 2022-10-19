@@ -4,6 +4,7 @@
    </div>
 </template>
 <script>
+import { mapState } from 'vuex'
 import axios from 'axios'
 import { getProvinceMapInfo } from '@/utils/map_utils'
 // import china from '../../public/static/map/china.json'
@@ -16,18 +17,29 @@ export default {
       mapData: {} // 所获取的矢量数据
     }
   },
+  created () {
+    // 在组件创建完成之后 进行回调函数的注册
+    this.$socket.registerCallBack('rankData', this.getData)
+  },
   mounted () {
     this.initChart()
-    this.getData()
+    // this.getData()
+    this.$socket.send({
+      action: 'getData',
+      socketType: 'mapData',
+      chartName: 'map',
+      value: ''
+    })
     window.addEventListener('resize', this.screenAdapter)
     this.screenAdapter()
   },
   destroyed () {
     window.removeEventListener('resize', this.screenAdapter)
+    this.$socket.unRegisterCallBack('mapData')
   },
   methods: {
     async initChart () {
-      this.chartInstance = this.$echarts.init(this.$refs.map_ref, 'chalk')
+      this.chartInstance = this.$echarts.init(this.$refs.map_ref, this.theme)
       // 获取中国地图的矢量数据
       // http://localhost:8080/static/map/china.json
       // 由于地图矢量图的数据并不是位于Koa2中，所以不能使用http
@@ -73,9 +85,9 @@ export default {
         this.chartInstance.setOption(changeOption)
       })
     },
-    async getData () {
+    getData (ret) {
       // 获取服务器数据
-      const { data: ret } = await this.$http.get('map')
+      // const { data: ret } = await this.$http.get('map')
       this.allDate = ret
       // console.log(this.allDate)
       this.updateChart()
@@ -136,6 +148,18 @@ export default {
         }
       }
       this.chartInstance.setOption(reverOption)
+    }
+  },
+  computed: {
+    ...mapState(['theme'])
+  },
+  watch: {
+    theme () {
+      console.log('主题切换了')
+      this.chartInstance.dispose() // 销毁当前的图表
+      this.initChart() // 重新以最新的主题名称初始化图表对象
+      this.screenAdapter() // 完成屏幕的适配
+      this.updateChart() // 更新图表的展示
     }
   }
 }
